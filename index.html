@@ -1,223 +1,313 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic School Website</title>
-    <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>For You ❤</title>
+  <style>
+    /* ---------- Reset ---------- */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    body{background:linear-gradient(120deg,#ffeef6 0%, #fff7ed 50%, #fef9ff 100%);overflow:hidden;color:#2b2b2b}
 
-        /* Smooth Scroll */
-        html {
-            scroll-behavior: smooth;
-        }
+    /* ---------- Hearty animated background ---------- */
+    .bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .heart{position:absolute;width:24px;height:24px;background:radial-gradient(circle at 30% 35%, #fff 0 10%, transparent 11%),linear-gradient(45deg,#ff6aa6,#ffb3d9);transform:rotate(-45deg);border-radius:20px 20px 0 0}
+    .heart:before,.heart:after{content:'';position:absolute;background:inherit;border-radius:50%;width:24px;height:24px}
+    .heart:before{top:-12px;left:0}
+    .heart:after{left:12px;top:0}
 
-        /* Header Section */
-        header {
-            height: 100vh;
-            background: linear-gradient(45deg, #3b4d61, #102027);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            animation: fadeIn 3s ease-in-out;
-        }
+    /* generate many hearts (JS will position/animate) */
 
-        header h1 {
-            font-size: 3rem;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
+    /* ---------- Container ---------- */
+    .wrap{position:relative;z-index:2;height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
+    .card{width:min(980px,96%);background:linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,255,255,0.7));backdrop-filter: blur(6px);border-radius:20px;box-shadow:0 12px 40px rgba(40,20,40,0.12);overflow:hidden;border:1px solid rgba(255,255,255,0.6)}
 
-        header p {
-            font-size: 1.3rem;
-            margin-top: 10px;
-        }
+    /* ---------- Intro overlay ---------- */
+    .intro{height:100%;display:grid;place-items:center;padding:48px}
+    .intro h1{font-size:clamp(28px,6vw,48px);letter-spacing:1px;color:#37243b}
+    .intro p{margin-top:12px;font-size:clamp(14px,2.2vw,18px);color:#5b3b4f}
+    .btn{margin-top:22px;background:#ff6aa6;color:white;padding:14px 22px;border-radius:999px;border:none;cursor:pointer;font-weight:600;box-shadow:0 8px 24px rgba(255,106,166,0.18)}
 
-        /* Navigation Bar */
-        nav {
-            background: rgba(0, 0, 0, 0.7);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 15px 0;
-            z-index: 10;
-            transition: background 0.3s ease-in-out;
-        }
+    /* ---------- Stage (slides) ---------- */
+    .stage{display:none;padding:36px;min-height:420px}
+    .stage.active{display:block}
+    .row{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:center}
+    @media (max-width:860px){.row{grid-template-columns:1fr}.stage{padding:18px}}
 
-        nav.scrolled {
-            background: rgba(0, 0, 0, 1);
-        }
+    .panel{padding:18px}
+    .message{background:linear-gradient(180deg,#fff9fb,#fff);padding:20px;border-radius:14px;box-shadow:0 6px 18px rgba(40,20,40,0.06)}
+    .message h2{font-size:20px;margin-bottom:8px}
+    .message p{line-height:1.5;color:#533a4a}
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-        }
+    .gallery{display:flex;flex-direction:column;gap:14px;align-items:center}
+    .photo{width:100%;max-width:320px;height:220px;border-radius:12px;background:#eee;display:grid;place-items:center;overflow:hidden;position:relative}
+    .photo img{width:100%;height:100%;object-fit:cover;display:block}
 
-        nav ul li {
-            margin: 0 20px;
-            transition: transform 0.3s ease;
-        }
+    /* text heart badges */
+    .badge{display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,106,166,0.12);color:#ff2f78;font-weight:700}
 
-        nav ul li a {
-            text-decoration: none;
-            color: white;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 10px;
-        }
+    /* ---------- Controls ---------- */
+    .controls{display:flex;gap:12px;justify-content:center;padding:20px;border-top:1px solid rgba(60,20,40,0.05)}
+    .controls button{background:transparent;border:1px solid rgba(60,20,40,0.06);padding:10px 14px;border-radius:10px;cursor:pointer}
 
-        nav ul li:hover {
-            transform: translateY(-5px);
-        }
+    /* ---------- Finale ---------- */
+    .finale{display:none;padding:40px;text-align:center}
+    .finale.show{display:block}
+    .finale h1{font-size:34px;color:#732a4a}
+    .fireworks{height:220px}
 
-        nav ul li a:hover {
-            color: #f2b922;
-            border-bottom: 2px solid #f2b922;
-        }
+    /* little pulse */
+    .heart-center{display:inline-block;width:80px;height:80px;background:linear-gradient(45deg,#ff7aa8,#ffb8d6);transform:rotate(-45deg);border-radius:18px 18px 0 0;margin-top:18px;position:relative}
+    .heart-center:before,.heart-center:after{content:'';position:absolute;background:inherit;border-radius:50%;width:80px;height:80px}
+    .heart-center:before{top:-40px;left:0}
+    .heart-center:after{left:40px;top:0}
 
-        /* Main Section */
-        .main-section {
-            padding: 80px 20px;
-            background: #f5f5f5;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(50px);
-            animation: slideIn 1.5s ease-out forwards;
-        }
+    /* simple floating animation for the left message bubble */
+    .float{animation:float 4s ease-in-out infinite}
+    @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
 
-        .main-section h2 {
-            font-size: 2rem;
-            color: #333;
-            margin-bottom: 20px;
-        }
+    /* small type & footer */
+    footer{font-size:12px;padding:12px;text-align:center;color:#5a3b4f}
 
-        .main-section p {
-            font-size: 1.2rem;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.5;
-            color: #666;
-        }
+    /* confetti particles */
+    .confetti{position:absolute;inset:0;pointer-events:none;z-index:4}
+    .confetti .piece{position:absolute;width:10px;height:14px;opacity:0.95}
 
-        /* Scroll Animation */
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(50px);
-            animation: slideIn 1.5s ease-out forwards;
-        }
-
-        /* Footer Styling */
-        footer {
-            background: #333;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(50px);
-            animation: slideIn 1.5s ease-out forwards;
-            animation-delay: 1s;
-        }
-
-        footer a {
-            color: #fff;
-            text-decoration: none;
-            margin-left: 10px;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Keyframe Animations */
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            0% { opacity: 0; transform: translateY(50px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-    </style>
+  </style>
 </head>
 <body>
-
-    <!-- Header Section -->
-    <header>
-        <div>
-            <h1>Welcome to the Creative School</h1>
-            <p>Master Your Craft. Shape Your Future.</p>
+  <div class="bg" id="bg"></div>
+  <div class="wrap">
+    <div class="card" role="main">
+      <div class="intro" id="intro">
+        <div style="text-align:center;max-width:760px">
+          <h1>Hey <span id="herNamePreview">Love</span> ❤️</h1>
+          <p>I've made you a little surprise. Click the heart to open a tiny world I made just for you.</p>
+          <button class="btn" id="startBtn">Open the surprise ✨</button>
         </div>
-    </header>
+      </div>
 
-    <!-- Navigation Section -->
-    <nav id="navbar">
-        <ul>
-            <li><a href="#about">About</a></li>
-            <li><a href="#programs">Programs</a></li>
-            <li><a href="#admissions">Admissions</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
+      <div class="stage" id="stage">
+        <!-- Slide 1 -->
+        <div class="slide active" data-index="0">
+          <div class="row">
+            <div class="panel">
+              <div class="message float">
+                <h2>To my <span class="badge" id="herNameBadge">Love</span></h2>
+                <p id="msg1">You are my sunlight on cloudy days, my calm in every storm. Every little laugh of yours makes the world kinder.</p>
+              </div>
+            </div>
 
-    <!-- Main Content Section -->
-    <div id="about" class="main-section animate-on-scroll">
-        <h2>About Our School</h2>
-        <p>
-            We are dedicated to providing an exceptional educational experience with cutting-edge technology and expert faculty.
-            Our students gain the skills to thrive in the creative industries, from film production to digital art and beyond.
-        </p>
+            <div class="gallery">
+              <div class="photo" id="photo1">
+                <!-- Replace the source with your megacloud image link or any URL -->
+                <img src="https://via.placeholder.com/480x320.png?text=Your+Photo+1" alt="photo1" />
+              </div>
+              <div class="photo" id="photo2">
+                <img src="https://via.placeholder.com/480x320.png?text=Your+Photo+2" alt="photo2" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide" data-index="1" style="margin-top:18px">
+          <div class="row">
+            <div class="panel">
+              <div class="message">
+                <h2>Remember when…</h2>
+                <p id="msg2">That evening we got lost but found the little street food stall — I still think about your laugh that night. Moments with you live forever.</p>
+              </div>
+              <div style="margin-top:12px">
+                <span class="badge">Date: <strong id="specialDate">DD-MM-YYYY</strong></span>
+              </div>
+            </div>
+
+            <div class="gallery">
+              <div class="photo" id="photo3"><img src="https://via.placeholder.com/480x320.png?text=Memory+Photo" alt="photo3"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3 (interactive) -->
+        <div class="slide" data-index="2" style="margin-top:18px">
+          <div class="row">
+            <div class="panel">
+              <div class="message">
+                <h2>Something silly</h2>
+                <p id="msg3">Press the little heart and see what happens... (do it, I dare you 💖)</p>
+                <div style="margin-top:14px"><button class="btn" id="tinyHeart">❤</button></div>
+              </div>
+            </div>
+            <div class="gallery">
+              <div class="photo" id="photo4"><img src="https://via.placeholder.com/480x320.png?text=Surprise+Gif" alt="photo4"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Finale -->
+        <div class="finale" id="finale">
+          <h1>Will you be mine forever?</h1>
+          <div class="heart-center" aria-hidden></div>
+          <p style="margin-top:18px">I love you more than words can say. <strong id="fromName">— From Me</strong></p>
+          <div class="fireworks" id="fireworks"></div>
+        </div>
+
+        <div class="controls" id="controls">
+          <button id="prevBtn">← Prev</button>
+          <button id="nextBtn">Next →</button>
+          <button id="endBtn">Surprise Finale ✨</button>
+        </div>
+
+      </div>
+      <footer>Made with lots of heartbeats ❤</footer>
     </div>
+  </div>
 
-    <div id="programs" class="main-section animate-on-scroll">
-        <h2>Our Programs</h2>
-        <p>
-            Our programs are designed to prepare you for success in the competitive world of digital arts. Whether you want to pursue animation, visual effects, or interactive media, we have the tools and faculty to help you succeed.
-        </p>
-    </div>
+  <div class="confetti" id="confetti"></div>
 
-    <div id="admissions" class="main-section animate-on-scroll">
-        <h2>Admissions</h2>
-        <p>
-            Interested in joining us? Our admissions team is here to help you every step of the way. Check out the admissions page for more details on how to apply.
-        </p>
-    </div>
+  <script>
+    /*******************
+      Basic personalization
+    *******************/
+    const herName = 'NAME_HERE'; // <- replace this with her name
+    const fromName = 'YOUR_NAME'; // <- replace with your name/signature
+    const specialDate = '01-01-2024'; // <- any important date
 
-    <!-- Footer Section -->
-    <footer>
-        <p>&copy; 2025 Creative School. All rights reserved.</p>
-        <p>
-            <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
-        </p>
-    </footer>
+    document.getElementById('herNamePreview').textContent = herName;
+    document.getElementById('herNameBadge').textContent = herName;
+    document.getElementById('fromName').textContent = '— ' + fromName;
+    document.getElementById('specialDate').textContent = specialDate;
 
-    <script>
-        // Change nav background color when scrolling
-        window.onscroll = function() {
-            var navbar = document.getElementById("navbar");
-            if (window.scrollY > 50) {
-                navbar.classList.add("scrolled");
-            } else {
-                navbar.classList.remove("scrolled");
-            }
-        }
-    </script>
+    // Slides logic
+    const intro = document.getElementById('intro');
+    const stage = document.getElementById('stage');
+    const startBtn = document.getElementById('startBtn');
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const controls = document.getElementById('controls');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const endBtn = document.getElementById('endBtn');
+    const finale = document.getElementById('finale');
 
+    let idx = 0;
+    function show(i){
+      slides.forEach(s=>s.classList.toggle('active', +s.dataset.index===i));
+      idx = i;
+    }
+
+    startBtn.addEventListener('click', ()=>{
+      intro.style.display='none';
+      stage.classList.add('active');
+      show(0);
+      controls.style.display='flex';
+      playHearts();
+    });
+
+    prevBtn.addEventListener('click', ()=> show(Math.max(0, idx-1)));
+    nextBtn.addEventListener('click', ()=> show(Math.min(slides.length-1, idx+1)));
+    endBtn.addEventListener('click', ()=>{
+      stage.style.display='none';
+      finale.classList.add('show');
+      launchConfetti();
+      sparkleFireworks();
+    });
+
+    // tiny heart interaction
+    document.getElementById('tinyHeart').addEventListener('click', e=>{
+      e.currentTarget.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:400});
+      // little cheeky message change
+      const m = document.getElementById('msg3');
+      m.textContent = 'Told you it would do something :) Kisses ~';
+    });
+
+    /*******************
+      Hearts background generator
+    *******************/
+    const bg = document.getElementById('bg');
+    function playHearts(){
+      for(let i=0;i<28;i++){
+        const el = document.createElement('div');
+        el.className='heart';
+        const left = Math.random()*100;
+        const top = Math.random()*100;
+        const s = 8+Math.random()*28;
+        el.style.left = left+'%';
+        el.style.top = top+'%';
+        el.style.width = s+'px';
+        el.style.height = s+'px';
+        el.style.opacity = 0.4+Math.random()*0.9;
+        bg.appendChild(el);
+        // animate
+        const animDur = 8000 + Math.random()*9000;
+        el.animate([{transform:'translateY(0) scale(0.9)',opacity:el.style.opacity},{transform:'translateY(-80px) scale(1.05)',opacity:0}],{duration:animDur,iterations:Infinity,easing:'ease-in-out',direction:'alternate'});
+      }
+    }
+
+    /*******************
+      Confetti + fireworks (simple)
+    *******************/
+    const confettiRoot = document.getElementById('confetti');
+    function launchConfetti(){
+      for(let i=0;i<60;i++){
+        const p = document.createElement('div');
+        p.className='piece';
+        p.style.background = ['#ff6aa6','#ffd3e8','#ffd27a','#ffb3d9','#fbd6ff'][Math.floor(Math.random()*5)];
+        const left = Math.random()*100; p.style.left = left+'%';
+        p.style.top = (Math.random()*40)+'%';
+        p.style.transform = 'rotate('+Math.floor(Math.random()*360)+'deg)';
+        confettiRoot.appendChild(p);
+        const fall = p.animate([{transform:'translateY(0) rotate(0)'},{transform:'translateY(600px) rotate(720deg)'}],{duration:2500+Math.random()*1800,iterations:1,easing:'cubic-bezier(.2,.8,.2,1)'});
+        fall.onfinish = ()=> p.remove();
+      }
+    }
+
+    function sparkleFireworks(){
+      const fw = document.getElementById('fireworks');
+      fw.innerHTML='';
+      for(let i=0;i<8;i++){
+        const dot = document.createElement('div');
+        dot.style.position='absolute';
+        dot.style.left = (10 + i*10) + '%';
+        dot.style.top = '40%';
+        dot.style.width='8px';
+        dot.style.height='8px';
+        dot.style.borderRadius='50%';
+        dot.style.background = ['#ff6aa6','#ffd27a','#ffb3d9','#ffd3e8'][i%4];
+        fw.appendChild(dot);
+        dot.animate([{transform:'scale(0)'},{transform:'scale(1) translateY(-120px)'}],{duration:900+Math.random()*600,iterations:1,easing:'cubic-bezier(.2,.8,.2,1)'});
+      }
+    }
+
+    /*******************
+      Optional: Replace images with Mega links
+      If you host images on Mega (megacloud/mega.nz), use their public link to the image file and paste into the <img src=> attributes below.
+      Example (replace):
+        document.querySelector('#photo1 img').src = 'https://mega.nz/your-public-image-link'
+    *******************/
+    // Example placeholders - replace these URLs with your actual image URLs (Mega direct links or any image CDN)
+    // document.querySelector('#photo1 img').src = 'YOUR_MEGA_IMAGE_URL_1'
+    // document.querySelector('#photo2 img').src = 'YOUR_MEGA_IMAGE_URL_2'
+    // document.querySelector('#photo3 img').src = 'YOUR_MEGA_IMAGE_URL_3'
+    // document.querySelector('#photo4 img').src = 'YOUR_MEGA_IMAGE_URL_4'
+
+    /*******************
+      Quick helper: make some fields editable quickly (so I can personalize if you give me the text)
+    *******************/
+    function personalize({her,from,date,msgs,images}){
+      if(her) document.getElementById('herNamePreview').textContent = her, document.getElementById('herNameBadge').textContent = her;
+      if(from) document.getElementById('fromName').textContent = '— ' + from;
+      if(date) document.getElementById('specialDate').textContent = date;
+      if(msgs && msgs.length){ document.getElementById('msg1').textContent = msgs[0] || document.getElementById('msg1').textContent; document.getElementById('msg2').textContent = msgs[1] || document.getElementById('msg2').textContent; document.getElementById('msg3').textContent = msgs[2] || document.getElementById('msg3').textContent }
+      if(images){
+        const ids = ['#photo1 img','#photo2 img','#photo3 img','#photo4 img'];
+        images.forEach((u,i)=>{ if(u) document.querySelector(ids[i]).src = u })
+      }
+    }
+
+    // if you want me to personalize it now, tell me the values and I'll give you the exact line to paste into the file or I'll edit it here.
+
+  </script>
 </body>
 </html>
