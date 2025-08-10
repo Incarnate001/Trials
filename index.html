@@ -1,313 +1,469 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>For You ❤</title>
-  <style>
-    /* ---------- Reset ---------- */
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
-    body{background:linear-gradient(120deg,#ffeef6 0%, #fff7ed 50%, #fef9ff 100%);overflow:hidden;color:#2b2b2b}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>For You ❤ Multi-Slide</title>
+<style>
+  /* Reset */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background: linear-gradient(120deg,#ffeef6 0%, #fff7ed 50%, #fef9ff 100%); color: #2b2b2b; overflow: hidden; }
 
-    /* ---------- Hearty animated background ---------- */
-    .bg{position:fixed;inset:0;z-index:0;pointer-events:none}
-    .heart{position:absolute;width:24px;height:24px;background:radial-gradient(circle at 30% 35%, #fff 0 10%, transparent 11%),linear-gradient(45deg,#ff6aa6,#ffb3d9);transform:rotate(-45deg);border-radius:20px 20px 0 0}
-    .heart:before,.heart:after{content:'';position:absolute;background:inherit;border-radius:50%;width:24px;height:24px}
-    .heart:before{top:-12px;left:0}
-    .heart:after{left:12px;top:0}
+  /* Heart background (shared) */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .heart {
+    position: absolute;
+    background:
+      radial-gradient(circle at 30% 35%, #fff 0 10%, transparent 11%),
+      linear-gradient(45deg,#ff6aa6,#ffb3d9);
+    transform: rotate(-45deg);
+    border-radius: 20px 20px 0 0;
+  }
+  .heart::before, .heart::after {
+    content: '';
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+  }
+  .heart::before {
+    top: -50%;
+    left: 0;
+  }
+  .heart::after {
+    left: 50%;
+    top: 0;
+  }
 
-    /* generate many hearts (JS will position/animate) */
+  /* Container for all slides */
+  section {
+    display: none;
+    position: relative;
+    height: 100vh;
+    padding: 32px;
+    overflow: auto;
+  }
+  section.active {
+    display: block;
+  }
 
-    /* ---------- Container ---------- */
-    .wrap{position:relative;z-index:2;height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
-    .card{width:min(980px,96%);background:linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,255,255,0.7));backdrop-filter: blur(6px);border-radius:20px;box-shadow:0 12px 40px rgba(40,20,40,0.12);overflow:hidden;border:1px solid rgba(255,255,255,0.6)}
+  /* Slide 1 styles */
+  #slide1 .wrap {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #slide1 .card {
+    width: min(980px, 96%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7));
+    backdrop-filter: blur(6px);
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(40,20,40,0.12);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+  #slide1 .intro {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 48px;
+    text-align: center;
+    max-width: 760px;
+    margin: auto;
+  }
+  #slide1 h1 {
+    font-size: clamp(28px, 6vw, 48px);
+    letter-spacing: 1px;
+    color: #37243b;
+  }
+  #slide1 p {
+    margin-top: 12px;
+    font-size: clamp(14px, 2.2vw, 18px);
+    color: #5b3b4f;
+  }
+  #slide1 .btn {
+    margin-top: 22px;
+    background: #ff6aa6;
+    color: white;
+    padding: 14px 22px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(255,106,166,0.18);
+  }
+  #slide1 .date {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #7a5875;
+    font-style: italic;
+  }
 
-    /* ---------- Intro overlay ---------- */
-    .intro{height:100%;display:grid;place-items:center;padding:48px}
-    .intro h1{font-size:clamp(28px,6vw,48px);letter-spacing:1px;color:#37243b}
-    .intro p{margin-top:12px;font-size:clamp(14px,2.2vw,18px);color:#5b3b4f}
-    .btn{margin-top:22px;background:#ff6aa6;color:white;padding:14px 22px;border-radius:999px;border:none;cursor:pointer;font-weight:600;box-shadow:0 8px 24px rgba(255,106,166,0.18)}
+  /* Slide 2 styles */
+  #slide2 .container {
+    position: relative;
+    max-width: 900px;
+    margin: 50px auto;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(40, 20, 40, 0.12);
+    padding: 30px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+  }
+  #slide2 .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 20px;
+    position: relative;
+  }
+  #slide2 .scroll-area::before,
+  #slide2 .scroll-area::after {
+    content: '';
+    position: sticky;
+    left: 0; right: 0;
+    height: 40px;
+    pointer-events: none;
+    z-index: 5;
+  }
+  #slide2 .scroll-area::before {
+    top: 0;
+    background: linear-gradient(to bottom, white 0%, transparent 100%);
+  }
+  #slide2 .scroll-area::after {
+    bottom: 0;
+    background: linear-gradient(to top, white 0%, transparent 100%);
+  }
+  #slide2 .text-block {
+    margin-bottom: 40px;
+    line-height: 1.5;
+    font-size: 1.05rem;
+    color: #2b2b2b;
+  }
+  #slide2 .heading {
+    font-weight: 900;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 25px;
+    color: #000000;
+  }
+  #slide2 .glow {
+    font-weight: 700;
+    color: #ff2f78;
+    text-shadow:
+      0 0 8px #ff6aa6,
+      0 0 20px #ffb3d9,
+      0 0 30px #ffb3d9;
+  }
+  #slide2 .heart-btn {
+    display: block;
+    margin: 10px auto 0;
+    background: linear-gradient(45deg, #ff7aa8, #ffb8d6);
+    border: none;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 16px #ffb3d9;
+    transition: transform 0.3s ease;
+  }
+  #slide2 .heart-btn:hover {
+    transform: scale(1.1);
+  }
+  #slide2 .press-heart-text {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #e63971;
+    text-shadow:
+      0 0 10px #ff7aa8,
+      0 0 20px #ffb3d9;
+  }
+  #slide2 .sweet-message {
+    text-align: center;
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #d43e6f;
+    text-shadow:
+      0 0 8px #ff6aa6,
+      0 0 20px #ffb3d9;
+  }
 
-    /* ---------- Stage (slides) ---------- */
-    .stage{display:none;padding:36px;min-height:420px}
-    .stage.active{display:block}
-    .row{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:center}
-    @media (max-width:860px){.row{grid-template-columns:1fr}.stage{padding:18px}}
+  /* Slide 3 styles */
+  #slide3 {
+    margin-top: 18px;
+    position: relative;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(40,20,40,0.12);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  #slide3 > div {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    z-index: 2;
+    position: relative;
+  }
+  #slide3 img {
+    width: 22%;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 6px 20px rgba(255, 106, 166, 0.3);
+    transition: transform 0.4s ease;
+    cursor: pointer;
+  }
+  #slide3 img:hover {
+    transform: scale(1.1);
+  }
+  #slide3 h2 {
+    text-align: center;
+    margin-top: 30px;
+    font-family: 'Georgia', serif;
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: #d6336c;
+    text-shadow: 0 0 8px #ff7aa8;
+    z-index: 2;
+  }
 
-    .panel{padding:18px}
-    .message{background:linear-gradient(180deg,#fff9fb,#fff);padding:20px;border-radius:14px;box-shadow:0 6px 18px rgba(40,20,40,0.06)}
-    .message h2{font-size:20px;margin-bottom:8px}
-    .message p{line-height:1.5;color:#533a4a}
-
-    .gallery{display:flex;flex-direction:column;gap:14px;align-items:center}
-    .photo{width:100%;max-width:320px;height:220px;border-radius:12px;background:#eee;display:grid;place-items:center;overflow:hidden;position:relative}
-    .photo img{width:100%;height:100%;object-fit:cover;display:block}
-
-    /* text heart badges */
-    .badge{display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,106,166,0.12);color:#ff2f78;font-weight:700}
-
-    /* ---------- Controls ---------- */
-    .controls{display:flex;gap:12px;justify-content:center;padding:20px;border-top:1px solid rgba(60,20,40,0.05)}
-    .controls button{background:transparent;border:1px solid rgba(60,20,40,0.06);padding:10px 14px;border-radius:10px;cursor:pointer}
-
-    /* ---------- Finale ---------- */
-    .finale{display:none;padding:40px;text-align:center}
-    .finale.show{display:block}
-    .finale h1{font-size:34px;color:#732a4a}
-    .fireworks{height:220px}
-
-    /* little pulse */
-    .heart-center{display:inline-block;width:80px;height:80px;background:linear-gradient(45deg,#ff7aa8,#ffb8d6);transform:rotate(-45deg);border-radius:18px 18px 0 0;margin-top:18px;position:relative}
-    .heart-center:before,.heart-center:after{content:'';position:absolute;background:inherit;border-radius:50%;width:80px;height:80px}
-    .heart-center:before{top:-40px;left:0}
-    .heart-center:after{left:40px;top:0}
-
-    /* simple floating animation for the left message bubble */
-    .float{animation:float 4s ease-in-out infinite}
-    @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
-
-    /* small type & footer */
-    footer{font-size:12px;padding:12px;text-align:center;color:#5a3b4f}
-
-    /* confetti particles */
-    .confetti{position:absolute;inset:0;pointer-events:none;z-index:4}
-    .confetti .piece{position:absolute;width:10px;height:14px;opacity:0.95}
-
-  </style>
+  /* Navigation buttons */
+  .nav-buttons {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    gap: 16px;
+  }
+  .nav-buttons button {
+    background: #ff6aa6;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 24px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255, 106, 166, 0.5);
+    transition: background-color 0.3s ease;
+  }
+  .nav-buttons button:disabled {
+    background: #d7a5b6;
+    cursor: not-allowed;
+  }
+  .nav-buttons button:hover:not(:disabled) {
+    background: #ff2f78;
+  }
+</style>
 </head>
 <body>
+
+  <!-- Heart background container (single, shared for all slides) -->
   <div class="bg" id="bg"></div>
-  <div class="wrap">
-    <div class="card" role="main">
-      <div class="intro" id="intro">
-        <div style="text-align:center;max-width:760px">
-          <h1>Hey <span id="herNamePreview">Love</span> ❤️</h1>
+
+  <!-- Slide 1 -->
+  <section id="slide1" class="active">
+    <div class="wrap">
+      <div class="card" role="main">
+        <div class="intro" id="intro">
+          <h1>Hey Meri Pyaari Si Chooti Si Chuhiya ❤️</h1>
           <p>I've made you a little surprise. Click the heart to open a tiny world I made just for you.</p>
-          <button class="btn" id="startBtn">Open the surprise ✨</button>
+          <button class="btn" id="startBtn" aria-label="Open the surprise">💖 Open the surprise</button>
+          <div class="date" id="todayDate" aria-live="polite"></div>
         </div>
       </div>
-
-      <div class="stage" id="stage">
-        <!-- Slide 1 -->
-        <div class="slide active" data-index="0">
-          <div class="row">
-            <div class="panel">
-              <div class="message float">
-                <h2>To my <span class="badge" id="herNameBadge">Love</span></h2>
-                <p id="msg1">You are my sunlight on cloudy days, my calm in every storm. Every little laugh of yours makes the world kinder.</p>
-              </div>
-            </div>
-
-            <div class="gallery">
-              <div class="photo" id="photo1">
-                <!-- Replace the source with your megacloud image link or any URL -->
-                <img src="https://via.placeholder.com/480x320.png?text=Your+Photo+1" alt="photo1" />
-              </div>
-              <div class="photo" id="photo2">
-                <img src="https://via.placeholder.com/480x320.png?text=Your+Photo+2" alt="photo2" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 2 -->
-        <div class="slide" data-index="1" style="margin-top:18px">
-          <div class="row">
-            <div class="panel">
-              <div class="message">
-                <h2>Remember when…</h2>
-                <p id="msg2">That evening we got lost but found the little street food stall — I still think about your laugh that night. Moments with you live forever.</p>
-              </div>
-              <div style="margin-top:12px">
-                <span class="badge">Date: <strong id="specialDate">DD-MM-YYYY</strong></span>
-              </div>
-            </div>
-
-            <div class="gallery">
-              <div class="photo" id="photo3"><img src="https://via.placeholder.com/480x320.png?text=Memory+Photo" alt="photo3"/></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 3 (interactive) -->
-        <div class="slide" data-index="2" style="margin-top:18px">
-          <div class="row">
-            <div class="panel">
-              <div class="message">
-                <h2>Something silly</h2>
-                <p id="msg3">Press the little heart and see what happens... (do it, I dare you 💖)</p>
-                <div style="margin-top:14px"><button class="btn" id="tinyHeart">❤</button></div>
-              </div>
-            </div>
-            <div class="gallery">
-              <div class="photo" id="photo4"><img src="https://via.placeholder.com/480x320.png?text=Surprise+Gif" alt="photo4"/></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Finale -->
-        <div class="finale" id="finale">
-          <h1>Will you be mine forever?</h1>
-          <div class="heart-center" aria-hidden></div>
-          <p style="margin-top:18px">I love you more than words can say. <strong id="fromName">— From Me</strong></p>
-          <div class="fireworks" id="fireworks"></div>
-        </div>
-
-        <div class="controls" id="controls">
-          <button id="prevBtn">← Prev</button>
-          <button id="nextBtn">Next →</button>
-          <button id="endBtn">Surprise Finale ✨</button>
-        </div>
-
-      </div>
-      <footer>Made with lots of heartbeats ❤</footer>
     </div>
+  </section>
+
+  <!-- Slide 2 -->
+  <section id="slide2" aria-label="Love Letter">
+    <div class="container">
+      <div class="scroll-area" id="scrollArea" tabindex="0">
+
+        <!-- First Text Block -->
+        <div class="text-block" id="block1">
+          <div class="heading">Why do I love my girlfriend?</div>
+          <p>Because her love is real. Pure. Undeniably genuine.<br>
+          She’s not just someone who cares—she feels with all her heart. She remembers the tiniest things, worries about me more than I do, checks in to see if I’ve eaten, rested, or simply if I’m okay. There’s this softness in her—this pyaari si bachi kind of innocence—that melts me every single time 😋😋<br>
+          She’s mature, strong, and graceful…<br>
+          But when she’s with me, she lets it all go. Drops the guard, and turns into meri chhoti si, pyaari si bachi 😙😙 And trust me—when she does that, it’s the most adorable, heart-melting thing ever 😋💗<br>
+          Someone once asked me, “<em>Isn’t she a bit clingy</em>?”<br>
+          And I just smiled—“So what if she is? <span class="glow">She’s mine.</span> I love it. And <em>I love her.</em>” 🥰<br>
+          And I truly means every single word of this line. 😤<br>
+          She’s loyal. Not just in words, but in soul.🔥<br>
+          She’s not just what I imagined in a partner—she’s beyond it. Truly my ideal type. 🥰🥰<br>
+          And if this really works out the way I believe it will—<br>
+          <span class="glow">I’ll be the luckiest man alive.</span>😌😌😇<br>
+          But it’s not just about what she does for me.<br>
+          It’s about who she is.<br>
+          She’s one of those <em>rare, authentically brilliant girls</em> out there unlike other girls. Smart, sharp, thoughtful—not just for herself, but always trying to become better for us. She’s humble, yet proud. Strong, yet soft. Comforting 🫠, dependable, grounding. She cares for me as if she's my mother and I'm her baby 🤣 (<em>fun fact : I am</em> 😋) She’s romantic when it counts. Supportive when I fall. And always, always evolving.<br>
+          She’s honest—even when it might be uncomfortable or embarrassing. She’s different—in the best way. She gets me in ways no one else ever has. And with her?<br>
+          I feel safe. Respected. Understood.<br>
+          And yeah—she’s really, really <span class="glow">cute</span> and adorable… and most importantly—<span class="glow">she’s mine.</span> 🫶🏻🫶🏻💗💗💗💗💗💗<br>
+          She’s the kind of person I can go through any problem with. The one who says sorry when she’s wrong, who pushes me to grow, who believes in us when the world doesn't.<br>
+          And sure, I could write a whole damn book on why I love her. 📚<br>
+          But even that wouldn’t answer the question.<br>
+          Because love isn’t a checklist. ✅<br>
+          It's a feeling beyond explanation.<br>
+          People ask me, “Why her?”🤔<br>
+          I laugh—because it’s such a stupid question.😏<br>
+          I loved her. And she loved me back. That’s how it began. That’s why it matters.💗<br>
+          The closest answer I have is this—<br>
+          When I see her, I feel peace.<br>
+          Even when life’s a mess, one look at her and everything inside me lights up.🫠😍<br>
+          She feels like home. Like family. Like the one soul I can anchor to.😙<br>
+          Her happiness? It’s not just important—it’s sacred to me.💗<br>
+          Because when she smiles… I feel complete. 💗<br>
+          That’s love.<br>
+          Raw. Intense. Possessive. Poetic. Dreamy.<br>
+          But absolutely real. 💗💗</p>
+        </div>
+
+        <!-- Second Text Block -->
+        <div class="text-block" id="block2">
+          <div class="heading">Why do I need her?</div>
+          <p>Afterall merko bhi to koi chahiye jo merko pyaar de 💗, mera khyaal rakhe 🥰, jiske saath me saari pinterest wali pics recreate kru 📸. Jo gate ke bahar mere liye kapde leke khadi rhe 👗. Jo mere liye roj subah lu ch banaye ☕. Jisko ghar aate hi m jor se hug kr loon 🤗. Jo aate hi meri shirt lele and usse phn ke ghar me ghoome 👚📱. Jo mere saath romantic romantic harkate kre 💕. Jiske saath m apne aur uske dono ke parents ka khyaal rakh saku 👨‍👩‍👧‍👦. Jiske saath trips pe jaau ✈️. Jiske saath bacho ki PTM Attend kru 🎒. Jiske saath retirement ke baare me Sochu 🏡. Jiske saath mountains me ek pyaara sa ghar loon 🏞️. In short jiske saath m apni life spend kru ❤️.</p>
+        </div>
+
+        <!-- Third Text Block -->
+        <div class="text-block" id="block3" style="text-align:center;">
+          <p class="press-heart-text">Press the heart to get something sweet from me 💖</p>
+          <button class="heart-btn" id="heartBtn" aria-label="Press heart for sweet message">❤</button>
+          <p class="sweet-message" id="sweetMsg" style="display:none;">I told you it will be something sweet :) Muah Muah Muah 😘😘😘😘😘😘😘😘😘</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3 -->
+  <section id="slide3" aria-label="Photo Love Slide">
+    <div>
+      <img src="https://raw.githubusercontent.com/Incarnate001/Trials/main/Images/IMG-20250528-WA0005.jpg" alt="Photo 1" />
+      <img src="https://raw.githubusercontent.com/Incarnate001/Trials/main/Images/IMG-20250701-WA0018.jpg" alt="Photo 2" />
+      <img src="https://raw.githubusercontent.com/Incarnate001/Trials/main/Images/IMG-20250712-WA0031.jpg" alt="Photo 3" />
+      <img src="https://raw.githubusercontent.com/Incarnate001/Trials/main/Images/IMG-20250722-WA0027.jpg" alt="Photo 4" />
+    </div>
+
+    <h2>Love You A Lot <br> Meri Pyaari Chooti Chuhiya</h2>
+  </section>
+
+  <!-- Navigation -->
+  <div class="nav-buttons" role="navigation" aria-label="Slide navigation">
+    <button id="prevBtn" disabled aria-disabled="true" aria-label="Previous slide">Prev</button>
+    <button id="nextBtn" aria-label="Next slide">Next</button>
   </div>
 
-  <div class="confetti" id="confetti"></div>
+<script>
+  // Heart background animation
+  const bg = document.getElementById('bg');
+  const heartCount = 28;
 
-  <script>
-    /*******************
-      Basic personalization
-    *******************/
-    const herName = 'NAME_HERE'; // <- replace this with her name
-    const fromName = 'YOUR_NAME'; // <- replace with your name/signature
-    const specialDate = '01-01-2024'; // <- any important date
+  function createHearts() {
+    for(let i=0; i<heartCount; i++){
+const heart = document.createElement('div');
+    heart.classList.add('heart');
+    resetHeart(heart);
+    bg.appendChild(heart);
+  }
+}
 
-    document.getElementById('herNamePreview').textContent = herName;
-    document.getElementById('herNameBadge').textContent = herName;
-    document.getElementById('fromName').textContent = '— ' + fromName;
-    document.getElementById('specialDate').textContent = specialDate;
+function resetHeart(heart) {
+  heart.style.width = heart.style.height = (Math.random() * 20 + 15) + 'px';
+  heart.style.left = Math.random() * 100 + 'vw';
+  heart.style.top = Math.random() * 100 + 'vh';
+  heart.style.opacity = Math.random() * 0.5 + 0.3;
+  heart.style.animationDuration = (Math.random() * 10 + 10) + 's';
+  heart.style.animationDelay = (Math.random() * 10) + 's';
+}
 
-    // Slides logic
-    const intro = document.getElementById('intro');
-    const stage = document.getElementById('stage');
-    const startBtn = document.getElementById('startBtn');
-    const slides = Array.from(document.querySelectorAll('.slide'));
-    const controls = document.getElementById('controls');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const endBtn = document.getElementById('endBtn');
-    const finale = document.getElementById('finale');
+// Animate hearts drifting upwards
+function animateHearts() {
+  const hearts = document.querySelectorAll('.heart');
+  hearts.forEach(h => {
+    let top = parseFloat(h.style.top);
+    top -= 0.1; // speed upward
+    if (top < -10) top = 110; // wrap around
+    h.style.top = top + 'vh';
+  });
+  requestAnimationFrame(animateHearts);
+}
 
-    let idx = 0;
-    function show(i){
-      slides.forEach(s=>s.classList.toggle('active', +s.dataset.index===i));
-      idx = i;
-    }
+// Initialize hearts
+createHearts();
+animateHearts();
 
-    startBtn.addEventListener('click', ()=>{
-      intro.style.display='none';
-      stage.classList.add('active');
-      show(0);
-      controls.style.display='flex';
-      playHearts();
-    });
+// Navigation between slides
+const slides = document.querySelectorAll('section');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+let currentSlide = 0;
 
-    prevBtn.addEventListener('click', ()=> show(Math.max(0, idx-1)));
-    nextBtn.addEventListener('click', ()=> show(Math.min(slides.length-1, idx+1)));
-    endBtn.addEventListener('click', ()=>{
-      stage.style.display='none';
-      finale.classList.add('show');
-      launchConfetti();
-      sparkleFireworks();
-    });
+function showSlide(index) {
+  slides.forEach((slide, i) => {
+    slide.classList.toggle('active', i === index);
+  });
+  currentSlide = index;
+  prevBtn.disabled = index === 0;
+  nextBtn.disabled = index === slides.length - 1;
+  prevBtn.setAttribute('aria-disabled', prevBtn.disabled);
+  nextBtn.setAttribute('aria-disabled', nextBtn.disabled);
+}
 
-    // tiny heart interaction
-    document.getElementById('tinyHeart').addEventListener('click', e=>{
-      e.currentTarget.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:400});
-      // little cheeky message change
-      const m = document.getElementById('msg3');
-      m.textContent = 'Told you it would do something :) Kisses ~';
-    });
+prevBtn.addEventListener('click', () => {
+  if (currentSlide > 0) showSlide(currentSlide - 1);
+});
+nextBtn.addEventListener('click', () => {
+  if (currentSlide < slides.length - 1) showSlide(currentSlide + 1);
+});
 
-    /*******************
-      Hearts background generator
-    *******************/
-    const bg = document.getElementById('bg');
-    function playHearts(){
-      for(let i=0;i<28;i++){
-        const el = document.createElement('div');
-        el.className='heart';
-        const left = Math.random()*100;
-        const top = Math.random()*100;
-        const s = 8+Math.random()*28;
-        el.style.left = left+'%';
-        el.style.top = top+'%';
-        el.style.width = s+'px';
-        el.style.height = s+'px';
-        el.style.opacity = 0.4+Math.random()*0.9;
-        bg.appendChild(el);
-        // animate
-        const animDur = 8000 + Math.random()*9000;
-        el.animate([{transform:'translateY(0) scale(0.9)',opacity:el.style.opacity},{transform:'translateY(-80px) scale(1.05)',opacity:0}],{duration:animDur,iterations:Infinity,easing:'ease-in-out',direction:'alternate'});
-      }
-    }
+// Slide 1: show today's date
+const todayDate = document.getElementById('todayDate');
+const today = new Date();
+todayDate.textContent = today.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 
-    /*******************
-      Confetti + fireworks (simple)
-    *******************/
-    const confettiRoot = document.getElementById('confetti');
-    function launchConfetti(){
-      for(let i=0;i<60;i++){
-        const p = document.createElement('div');
-        p.className='piece';
-        p.style.background = ['#ff6aa6','#ffd3e8','#ffd27a','#ffb3d9','#fbd6ff'][Math.floor(Math.random()*5)];
-        const left = Math.random()*100; p.style.left = left+'%';
-        p.style.top = (Math.random()*40)+'%';
-        p.style.transform = 'rotate('+Math.floor(Math.random()*360)+'deg)';
-        confettiRoot.appendChild(p);
-        const fall = p.animate([{transform:'translateY(0) rotate(0)'},{transform:'translateY(600px) rotate(720deg)'}],{duration:2500+Math.random()*1800,iterations:1,easing:'cubic-bezier(.2,.8,.2,1)'});
-        fall.onfinish = ()=> p.remove();
-      }
-    }
+// Slide 1: button to jump to slide 2
+document.getElementById('startBtn').addEventListener('click', () => {
+  showSlide(1);
+});
 
-    function sparkleFireworks(){
-      const fw = document.getElementById('fireworks');
-      fw.innerHTML='';
-      for(let i=0;i<8;i++){
-        const dot = document.createElement('div');
-        dot.style.position='absolute';
-        dot.style.left = (10 + i*10) + '%';
-        dot.style.top = '40%';
-        dot.style.width='8px';
-        dot.style.height='8px';
-        dot.style.borderRadius='50%';
-        dot.style.background = ['#ff6aa6','#ffd27a','#ffb3d9','#ffd3e8'][i%4];
-        fw.appendChild(dot);
-        dot.animate([{transform:'scale(0)'},{transform:'scale(1) translateY(-120px)'}],{duration:900+Math.random()*600,iterations:1,easing:'cubic-bezier(.2,.8,.2,1)'});
-      }
-    }
+// Slide 2: heart button shows sweet message
+const heartBtn = document.getElementById('heartBtn');
+const sweetMsg = document.getElementById('sweetMsg');
+heartBtn.addEventListener('click', () => {
+  if (sweetMsg.style.display === 'none') {
+    sweetMsg.style.display = 'block';
+    heartBtn.style.transform = 'scale(1.2)';
+    setTimeout(() => {
+      heartBtn.style.transform = '';
+    }, 300);
+  } else {
+    sweetMsg.style.display = 'none';
+  }
+});
+</script>
 
-    /*******************
-      Optional: Replace images with Mega links
-      If you host images on Mega (megacloud/mega.nz), use their public link to the image file and paste into the <img src=> attributes below.
-      Example (replace):
-        document.querySelector('#photo1 img').src = 'https://mega.nz/your-public-image-link'
-    *******************/
-    // Example placeholders - replace these URLs with your actual image URLs (Mega direct links or any image CDN)
-    // document.querySelector('#photo1 img').src = 'YOUR_MEGA_IMAGE_URL_1'
-    // document.querySelector('#photo2 img').src = 'YOUR_MEGA_IMAGE_URL_2'
-    // document.querySelector('#photo3 img').src = 'YOUR_MEGA_IMAGE_URL_3'
-    // document.querySelector('#photo4 img').src = 'YOUR_MEGA_IMAGE_URL_4'
-
-    /*******************
-      Quick helper: make some fields editable quickly (so I can personalize if you give me the text)
-    *******************/
-    function personalize({her,from,date,msgs,images}){
-      if(her) document.getElementById('herNamePreview').textContent = her, document.getElementById('herNameBadge').textContent = her;
-      if(from) document.getElementById('fromName').textContent = '— ' + from;
-      if(date) document.getElementById('specialDate').textContent = date;
-      if(msgs && msgs.length){ document.getElementById('msg1').textContent = msgs[0] || document.getElementById('msg1').textContent; document.getElementById('msg2').textContent = msgs[1] || document.getElementById('msg2').textContent; document.getElementById('msg3').textContent = msgs[2] || document.getElementById('msg3').textContent }
-      if(images){
-        const ids = ['#photo1 img','#photo2 img','#photo3 img','#photo4 img'];
-        images.forEach((u,i)=>{ if(u) document.querySelector(ids[i]).src = u })
-      }
-    }
-
-    // if you want me to personalize it now, tell me the values and I'll give you the exact line to paste into the file or I'll edit it here.
-
-  </script>
 </body>
 </html>
